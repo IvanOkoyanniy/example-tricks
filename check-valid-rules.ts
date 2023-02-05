@@ -60,29 +60,61 @@ const connectSchema: ConnectSchema = {
   },
 };
 
-type Process = (
-  start: string,
-  end: string,
-  handlerTypeStart?: string,
-  handlerTypeEnd?: string,
-  sideStart?: string,
-  sideEnd?: string,
-) => boolean;
+const deviceStart = 'orsh';
+const deviceEnd = 'orsh';
+const positionTypeStart = 'internal';
+const positionTypeEnd = 'internal';
+const sideStart = 'left';
+const sideEnd = 'right';
+  // returns => true
 
-const process: Process = (start, end, handlerTypeStart, handlerTypeEnd, sideStart, sideEnd): boolean => {
-  const connectDevices = `${start}-${end}`;
-  const connectHandlerType = `${handlerTypeStart}-${handlerTypeEnd}`;
-  const connectSides = `${sideStart}-${sideEnd}`;
-  const levelOne = connectSchema?.[connectDevices];
-  if (typeof levelOne === 'boolean') return levelOne;
 
-  const levelTwo = levelOne?.[connectHandlerType];
+const devicePath = `${deviceStart}-${deviceEnd}`;
+const handlerTypePath = `${positionTypeStart}-${positionTypeEnd}`;
+ const sidePath = `${sideStart}-${sideEnd}`;
 
-  if (typeof levelTwo === 'boolean') return levelTwo;
+  //this path past in getVerifySchemeByPath()
+  const path = `${devicePath}.${handlerTypePath}.${sidePath}`;
 
-  const levelTrhee = levelTwo?.[connectSides];
+export const getVerifySchemeByPath = (pathName: string): boolean => {
+  const paths = pathName.split('.');
 
-  return !!levelTrhee;
+  return paths.reduce((accObj, currPath, index, arr) => {
+    const isObject = typeof accObj === 'object';
+    const isLast = arr.length === index + 1;
+
+    if (isObject) {
+      return isLast ? !!accObj[currPath] : accObj[currPath];
+    }
+
+    return !!accObj;
+  }, connectSchema as unknown as boolean);
 };
 
-const isVerifyPath = process('ork', 'ork', 'internal', 'external', 'left', 'left-spliter');
+// OLD Version
+// type Process = (
+//   start: string,
+//   end: string,
+//   handlerTypeStart?: string,
+//   handlerTypeEnd?: string,
+//   sideStart?: string,
+//   sideEnd?: string,
+// ) => boolean;
+
+// const process: Process = (start, end, handlerTypeStart, handlerTypeEnd, sideStart, sideEnd): boolean => {
+//   const connectDevices = `${start}-${end}`;
+//   const connectHandlerType = `${handlerTypeStart}-${handlerTypeEnd}`;
+//   const connectSides = `${sideStart}-${sideEnd}`;
+//   const levelOne = connectSchema?.[connectDevices];
+//   if (typeof levelOne === 'boolean') return levelOne;
+
+//   const levelTwo = levelOne?.[connectHandlerType];
+
+//   if (typeof levelTwo === 'boolean') return levelTwo;
+
+//   const levelTrhee = levelTwo?.[connectSides];
+
+//   return !!levelTrhee;
+// };
+
+// const isVerifyPath = process('ork', 'ork', 'internal', 'external', 'left', 'left-spliter');
